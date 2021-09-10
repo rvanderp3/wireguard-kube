@@ -4,10 +4,16 @@ if [ -z $HOST_IP ]; then
     echo "could not retrieve IP address of node"    
 fi
 
-LAST_OCTET=$(echo ${HOST_IP} | cut -d'.' -f 4)
+THIRD_OCTET=$(echo ${HOST_IP} | cut -d'.' -f 3)
+FOURTH_OCTET=$(echo ${HOST_IP} | cut -d'.' -f 4)
 
-export WG_CLIENTIP=$(printf '172.16.2.%s/20' ${LAST_OCTET})
-export WG_PRIVKEY=$(sed -n ${LAST_OCTET}p /etc/wireguard-profiles/peers)
+INDEX=$((((THIRD_OCTET%16)*256)+FOURTH_OCTET))
+
+STARTING_THIRD_OCTET=240
+THIRD_OCTET=$(((INDEX/256)+STARTING_THIRD_OCTET))
+export WG_CLIENTIP=$(printf '172.16.%s.%s/20' ${THIRD_OCTET} ${FOURTH_OCTET})
+export WG_PRIVKEY=$(sed -n ${INDEX}p /etc/wireguard-profiles/peers)
+echo Private key index ${INDEX} client IP ${WG_CLIENTIP}
 envsubst < /etc/wireguard-profiles/wg0.conf.tmpl > /tmp/wg0.conf
 wireguard-go wg0
 mkdir /etc/wireguard
