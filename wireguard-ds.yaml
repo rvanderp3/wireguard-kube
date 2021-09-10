@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  labels:
+    app: vpn-wireguard-ds    
+  name: vpn-wireguard-ds
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: vpn-wireguard
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: vpn-wireguard
+      name: vpn-wireguard
+    spec:
+      nodeSelector:
+        wireguard-vpn-access: ''
+      hostNetwork: true
+      containers:
+      - image: quay.io/built-image:latest
+        imagePullPolicy: Always
+        name: vpn-wireguard
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: FallbackToLogsOnError
+        volumeMounts:
+         - mountPath: /etc/wireguard-profiles
+           name: wireguard-vpn-access
+        securityContext:
+          privileged: true
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: wireguard-vpn-access
+        secret:          
+          secretName: wireguard-vpn-access    

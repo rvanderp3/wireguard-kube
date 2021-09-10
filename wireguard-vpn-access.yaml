@@ -1,0 +1,11 @@
+kind: Secret
+apiVersion: v1
+metadata:
+  name: wireguard-vpn-access
+data:
+  peers: >-
+    base64 encoded private key list
+  wg0.conf.tmpl: >-
+    base64 encoded template
+
+type: Opaque
