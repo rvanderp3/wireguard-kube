@@ -2,11 +2,11 @@
 
 This project enables the WireGuard VPN to be installed on Kubernetes nodes as a daemonset.  WireGuard requires a statically assigned public key and IP address mapping.  One way this project allows the VPN to be deployed as a daemonset is by using the 4th octet as part of the client IP that the WireGuard client uses to communicate with the WireGuard server.  For example:
 
-WireGuard subnet: `172.16.0.0/24`
-Node IP: `192.168.190.2/24`
-Calculated WireGuard client IP: `172.16.0.2`
+WireGuard subnet: `172.16.240.0/20`
+Node IP: `192.168.190.2/20`
+Calculated WireGuard client IP: `172.16.254.2`
 
-Each IP in the `172.16.0.0/24` has a `Peer` definition in the server's WireGuard configuration.  When the daemonset deploys, `entrypoint.sh` calculates the client IP and looks up the associated private key in `/etc/wireguard-profiles/peers` for each node where the daemonset is deployed.  `generate-config.sh` produces a list of private keys as well as configuration to be appended to the end of an existing server WireGuard configuration.
+Each IP in the `172.16.240.0/20` has a `Peer` definition in the server's WireGuard configuration.  When the daemonset deploys, `entrypoint.sh` calculates the client IP and looks up the associated private key in `/etc/wireguard-profiles/peers` for each node where the daemonset is deployed.  `generate-config.sh` produces a list of private keys as well as configuration to be appended to the end of an existing server WireGuard configuration.
 
 Note: `entrypoint.sh` and `generate-config.sh` will need to be updated to account for your network size and subnet.
 
