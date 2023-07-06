@@ -3,7 +3,8 @@ if [ -z ${HOST_IP} ]; then
 fi
 
 if [ -z $HOST_IP ]; then
-    echo "could not retrieve IP address of node"    
+    echo "could not retrieve IP address of node"
+    exit 1  
 fi
 
 THIRD_OCTET=$(echo ${HOST_IP} | cut -d'.' -f 3)
@@ -14,7 +15,7 @@ if [ -z ${WG_INTERFACE} ]; then
     echo "WG_INTERFACE must be defined!"
     exit 1
 fi
-STARTING_THIRD_OCTET=${THIRD_OCTET:-240}
+STARTING_THIRD_OCTET=${STARTING_THIRD_OCTET:-240}
 THIRD_OCTET=$(((INDEX/256)+STARTING_THIRD_OCTET))
 export WG_CLIENTIP=$(printf '172.16.%s.%s/20' ${THIRD_OCTET} ${FOURTH_OCTET})
 export WG_PRIVKEY=$(sed -n ${INDEX}p /etc/wireguard-profiles/peers)
