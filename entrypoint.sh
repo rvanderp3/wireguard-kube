@@ -1,4 +1,6 @@
-HOST_IP=$(ifconfig ens5 | grep 'inet ' | xargs | cut -d' ' -f2)
+if [ -z ${HOST_IP} ]; then
+    HOST_IP=$(ifconfig ens5 | grep 'inet ' | xargs | cut -d' ' -f2)
+fi
 
 if [ -z $HOST_IP ]; then
     echo "could not retrieve IP address of node"    
@@ -10,6 +12,7 @@ FOURTH_OCTET=$(echo ${HOST_IP} | cut -d'.' -f 4)
 INDEX=$((((THIRD_OCTET%16)*256)+FOURTH_OCTET))
 if [ -z ${WG_INTERFACE} ]; then
     echo "WG_INTERFACE must be defined!"
+    exit 1
 fi
 STARTING_THIRD_OCTET=${THIRD_OCTET:-240}
 THIRD_OCTET=$(((INDEX/256)+STARTING_THIRD_OCTET))
